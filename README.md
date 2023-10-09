@@ -2,3 +2,9 @@
 Projekt Aplikacji Help Desk
 Projekt polega na stworzeniu strony internetowej na której po zalogowaniu użytkownik będzie mógł wpisać jakie ma prolbemy z komputerem, potem strona wypisze jak użytkownik może naprawić swój sprzęt.
 Strona ta będzie miała zastosowanie w różnych serwisach komputerowych lub użytkowników którzy nie mają wiedzy aby naprawić komputer lub problem jest bardzo skomplikowany.
+
+Projekt będzie składał się z:
+-Dokumentacji technicznej
+-Bazy danych stworzonej na potrzeby projektu
+-Stronie internetowej
+-Aplikacji Desktop (opjonalne)
