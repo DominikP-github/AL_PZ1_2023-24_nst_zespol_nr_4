@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-qtl=otk&n#zd_&*5%yr6ijnpm4m*52u_7y0s4lyoyx00ivav5%
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['.vercel.app']
 
 
 # Application definition
@@ -50,7 +50,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     
-   
+    
 ]
 
 ROOT_URLCONF = 'projekt2.urls'
