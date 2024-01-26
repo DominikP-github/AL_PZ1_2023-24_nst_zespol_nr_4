@@ -3,7 +3,7 @@ attrs==23.2.0
 contourpy==1.2.0
 contrib==0.3.0
 cycler==0.12.1
-Django==4.2.9
+Django==3.2.10
 django-utils2==3.0.2
 fonttools==4.47.2
 jsonschema==4.21.1
