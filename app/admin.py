@@ -1,9 +1,9 @@
 from django.contrib import admin
-from .models import Keyword,YourModel,SearchHistory
+from .models import Slowa,Fromularz,Historia
 
-admin.site.register(Keyword)
+admin.site.register(Slowa)
 
-admin.site.register(YourModel)
+admin.site.register(Fromularz)
 
-admin.site.register(SearchHistory)
-# Register your models here.
+admin.site.register(Historia)
+

@@ -1,17 +1,18 @@
-from django.shortcuts import render,HttpResponse,redirect
+from django.shortcuts import render,HttpResponse,redirect,get_object_or_404
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, get_object_or_404
-from .models import SearchHistory,YourModel
-from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
+from .models import Historia,Fromularz,Slowa, Historia
 from django.contrib.auth.models import Group
-from django.shortcuts import render, redirect
-from .forms import YourModelForm
+from .forms import YourModelForm,ChangeCredentialsForm
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib import messages
+from django.http import JsonResponse
+from django.shortcuts import render
+from .forms import SearchForm
 
 def display_forms(request):
-    forms_in_database = YourModel.objects.all()
+    forms_in_database = Fromularz.objects.all()
     return render(request, 'special_page.html', {'forms_in_database': forms_in_database})
 
 @login_required(login_url='login')
@@ -20,7 +21,7 @@ def form_page(request):
         form = YourModelForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('home')  # Redirect to a success page
+            return redirect('home')  
     else:
         form = YourModelForm()
 
@@ -28,18 +29,18 @@ def form_page(request):
 
 @login_required(login_url='login')
 def success_page(request):
-    return render(request, 'success_page.html')  # Create a success page template
+    return render(request, 'success_page.html')  
 
 @login_required(login_url='login')
 def special_page(request):
     special_group = Group.objects.get(name='SpecialGroup')
     if special_group in request.user.groups.all():
-        all_forms = YourModel.objects.all()
+        all_forms = Fromularz.objects.all()
         print("User is in 'SpecialGroup'")
         return render(request, 'special_page.html', {'all_forms': all_forms})
    
 def delete_form(request, form_id):
-    form = get_object_or_404(YourModel, id=form_id)
+    form = get_object_or_404(Fromularz, id=form_id)
 
     if request.method == 'DELETE':
         form.delete()
@@ -80,7 +81,7 @@ def LoginPage(request):
             login(request,user)
             return redirect('home')
         else:
-            return HttpResponse ("Username or Password is incorrect!!!")
+            return HttpResponse ("Hasło lub Login jest nie poprawny!!!")
 
     return render (request,'login.html')
 
@@ -88,16 +89,12 @@ def LogoutPage(request):
     logout(request)
     return redirect('login')
 
-from django.shortcuts import render
-from .models import Keyword, SearchHistory
-from .forms import SearchForm
 
 @login_required(login_url='login')
-def home(request):
-    # Sprawdzamy, czy użytkownik należy do grupy "SpecialGroup"
+def Main(request):
     special_group = Group.objects.get(name='SpecialGroup')
     if special_group in request.user.groups.all():
-        return redirect('special_page')  # Przekieruj na special_page.html
+        return redirect('special_page')
 
     user_search_history = []
 
@@ -105,7 +102,7 @@ def home(request):
         form = SearchForm(request.POST)
         if form.is_valid():
             sentence = form.cleaned_data['sentence']
-            keywords = Keyword.objects.values_list('word', 'opis_wyniku')
+            keywords = Slowa.objects.values_list('slowo', 'opis_wyniku')
             found_descriptions = []
 
             for keyword in keywords:
@@ -115,16 +112,14 @@ def home(request):
 
             description_with_html_line_breaks = "<br>".join(found_descriptions)
 
-            # Zapisujemy wyszukiwanie w historii użytkownika
             if request.user.is_authenticated:
-                user_history = SearchHistory.objects.create(
+                user_history = Historia.objects.create(
                     user=request.user,
                     sentence=sentence,
-                    description=description_with_html_line_breaks
+                    opis=description_with_html_line_breaks
                 )
 
-            # Pobieramy historię wyszukiwań dla zalogowanego użytkownika
-            user_search_history = SearchHistory.objects.filter(user=request.user).order_by('-timestamp')
+            user_search_history = Historia.objects.filter(user=request.user).order_by('-czas')
 
             return render(request, 'home.html', {
                 'sentence': sentence,
@@ -134,37 +129,63 @@ def home(request):
     else:
         form = SearchForm()
 
-    # Pobieramy historię wyszukiwań dla zalogowanego użytkownika (jeśli zalogowany)
-    user_search_history = SearchHistory.objects.filter(user=request.user).order_by('-timestamp')
+    user_search_history = Historia.objects.filter(user=request.user).order_by('-czas')
 
     return render(request, 'home.html', {'form': form, 'user_search_history': user_search_history})
 
 @login_required(login_url='login')
 def special_page(request):
-    # Sprawdzamy, czy użytkownik należy do grupy "SpecialGroup"
     special_group = Group.objects.get(name='SpecialGroup')
     if special_group in request.user.groups.all():
-        return render(request, 'special_page.html')  # Przekieruj na special_page.html
+        return render(request, 'special_page.html') 
     else:
         return redirect('home') 
 
 
 
 def search_history_detail(request, history_id):
-    history_entry = get_object_or_404(SearchHistory, id=history_id)
-    
-    # Pobieramy wszystkie wpisy z historii wyszukiwań dla zalogowanego użytkownika (jeśli zalogowany)
+    history_entry = get_object_or_404(Historia, id=history_id)
     user_search_history = []
     if request.user.is_authenticated:
-        user_search_history = SearchHistory.objects.filter(user=request.user).order_by('-timestamp')
+        user_search_history = Historia.objects.filter(user=request.user).order_by('-czas')
     
     return render(request, 'search_history_detail.html', {'history_entry': history_entry, 'user_search_history': user_search_history})
 
-
-from django.shortcuts import get_object_or_404
-from django.http import JsonResponse
-
 def delete_history(request, history_id):
-    history_entry = get_object_or_404(SearchHistory, id=history_id)
+    history_entry = get_object_or_404(Historia, id=history_id)
     history_entry.delete()
     return JsonResponse({'message': 'History entry deleted successfully'})
+
+
+@login_required(login_url='login')
+def change_credentials(request):
+    if request.method == 'POST':
+        form = ChangeCredentialsForm(request.POST)
+
+        if form.is_valid():
+            new_email = form.cleaned_data['new_email']
+            new_password1 = form.cleaned_data['new_password1']
+            new_password2 = form.cleaned_data['new_password2']
+            old_password = form.cleaned_data['old_password']
+
+            if new_email:
+                request.user.email = new_email
+                request.user.save()
+                messages.success(request, 'Email was successfully updated!')
+
+            if new_password1 and new_password2 and old_password:
+                password_form = PasswordChangeForm(request.user, {'old_password': old_password, 'new_password1': new_password1, 'new_password2': new_password2})
+                if password_form.is_valid():
+                    password_form.save()
+                    messages.success(request, 'Password was successfully updated!')
+                else:
+                    messages.error(request, 'Password update failed. Please check the provided information.')
+
+            if not new_email and not (new_password1 and new_password2 and old_password):
+                messages.warning(request, 'No changes were made.')
+
+            return redirect('home')
+    else:
+        form = ChangeCredentialsForm()
+
+    return render(request, 'change_credentials.html', {'form': form})
