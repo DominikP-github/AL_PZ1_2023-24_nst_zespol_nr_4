@@ -177,40 +177,39 @@
     <ul>
       <li><a href="{% url 'home'%}" style="color: white; text-decoration: none; text-align:center;">Nowa instrukcja</a></li>
     <ul>
-    <ul>
       <li><a href="{% url 'form_page'%}" style="color: white; text-decoration: none; text-align:center;">Pomoc</a></li>
     <ul>
-      <ul>
-        <li><p>Hisotria:</p></li>
-      <ul>
+      <li><a href="{% url 'change_credentials' %}"style="color: white; text-decoration: none; text-align:center;">Opcje Konta</a></li>
+    <ul>
+      <li><h1 style="color: white; text-decoration: none; text-align:center;">Historia:</h1></li>
+    <ul>
     </ul>
       <ul>
         {% if user_search_history %}
-          {% for entry in user_search_history %}
-            <li class="history-entry" data-history-id="{{ entry.id }}">
-              <a href="{% url 'search_history_detail' entry.id %}">{{ entry.sentence }}</a>
-              <button class="remove-history">X</button>
-            </li>
-            
-          {% endfor %}
-        {% endif %}
+        {% for entry in user_search_history %}
+          <li class="history-entry" data-history-id="{{ entry.id }}">
+            <a href="{% url 'search_history_detail' entry.id %}">{{ entry.sentence }}</a>
+            <button class="remove-history">X</button>
+          </li>
+          
+        {% endfor %}
+      {% endif %}
        
 </ul>
   </div>
 
   <div class="logout-div">
-    <a href="{% url 'logout' %}" class="logout-link">Logout</a>
+    <a href="{% url 'logout' %}" class="logout-link">Wyloguj</a>
   </div>
 </div>
 
 <div class="container">
   <div class="top-div">
     <div style=" padding: 1px 16px; height: 100%;">
-      <h2>Search History Detail</h2>
-      <p>Sentence: {{ history_entry.sentence }}</p>
-      <p>Description: {{ history_entry.description|safe }}</p>
-      <p>Timestamp: {{ history_entry.timestamp }}</p>
-      <!-- Dodatkowe informacje lub formatowanie, które chcesz dodać -->
+      <h2>Hisotria</h2>
+      <p>Zdanie: {{ history_entry.instrukcja }}</p>
+      <p>Wynik: {{ history_entry.opis|safe }}</p>
+      <p>Czas Utworzenia Instrukcji: {{ history_entry.czas }}</p>
     </div>
   </div>
 
@@ -220,15 +219,13 @@
    
 {% endblock %}
 
-    
-    <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+   
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
   </body>
 </html>
-<!-- Dodaj na końcu pliku home.html -->
+
 
 <script>
   document.addEventListener('DOMContentLoaded', function () {
@@ -240,13 +237,12 @@
         event.stopPropagation();
         var historyId = entry.getAttribute('data-history-id');
   
-        // Wyślij żądanie AJAX, aby usunąć historię z bazy danych
         fetch(`/delete_history/${historyId}/`)
           .then(response => response.json())
           .then(data => {
             console.log(data.message);
-            // Dodaj kod do odświeżenia widoku lub ukrycia/usunięcia elementu z historią
-            entry.style.display = 'none';  // Możesz użyć innych metod, w zależności od Twoich potrzeb
+            
+            entry.style.display = 'none';  
           })
           .catch(error => console.error('Error:', error));
       });

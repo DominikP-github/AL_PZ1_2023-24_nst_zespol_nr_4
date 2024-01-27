@@ -40,21 +40,21 @@
 
     <div class='parent'>
         <div class='child'><h2>Formularze</h2></div>
-        <div class='child2'> <a href="{% url 'logout' %}" style="text-decoration: none; color:white">Logout</a></div>
+        <div class='child2'> <a href="{% url 'logout' %}" style="text-decoration: none; color:white">Wyloguj</a></div>
       </div>
 
     
     
 
     {% for form_in_database in forms_in_database %}
-        <div style="display: flex; align-items: center;">
+        <div style="display: flex; align-items: center; padding:20px;">
             <div style="flex-grow: 1;">
                 <p>Imie: {{ form_in_database.name }}</p>
                 <p>Email: {{ form_in_database.email }}</p>
                 <p>Problem: {{ form_in_database.message }}</p>
             </div>
             <div>
-                <button class="delete-button" onclick="deleteForm('{{ form_in_database.id }}')">Delete</button>
+                <button class="delete-button" onclick="deleteForm('{{ form_in_database.id }}')">USUŃ</button>
             </div>
         </div>
         <hr>
@@ -64,23 +64,20 @@
 
 </body>
 </html>
-    <!-- W kodzie HTML -->
     <script>
         function deleteForm(formId) {
-            // Pobierz CSRF token z ciasteczka
             var csrfToken = getCookie('csrftoken');
     
             fetch('/delete-form/' + formId + '/?nocache=' + new Date().getTime(), {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRFToken': csrfToken  // Dodaj nagłówek CSRFToken
+                    'X-CSRFToken': csrfToken  
                 },
             })
             .then(response => {
                 if (response.ok) {
                     console.log('Formularz o ID ' + formId + ' został usunięty');
-                    // Odśwież stronę po usunięciu formularza
                     location.reload();
                 } else {
                     console.error('Błąd podczas usuwania formularza:', response.statusText);
@@ -90,15 +87,12 @@
                 console.error('Błąd podczas usuwania formularza:', error);
             });
         }
-    
-        // Funkcja do pobierania wartości cookie CSRFToken
         function getCookie(name) {
             var cookieValue = null;
             if (document.cookie && document.cookie !== '') {
                 var cookies = document.cookie.split(';');
                 for (var i = 0; i < cookies.length; i++) {
                     var cookie = cookies[i].trim();
-                    // Pobierz CSRFToken z ciasteczka
                     if (cookie.substring(0, name.length + 1) === (name + '=')) {
                         cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
                         break;

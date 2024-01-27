@@ -22,7 +22,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('',views.SignupPage,name='signup'),
     path('login/',views.LoginPage,name='login'),
-    path('home/', views.home, name='home'),
+    path('home/', views.Main, name='home'),
     path('logout/',views.LogoutPage,name='logout'),
     path('search_history_detail/<int:history_id>/', views.search_history_detail, name='search_history_detail'),
     path('delete_history/<int:history_id>/', views.delete_history, name='delete_history'),
@@ -30,4 +30,5 @@ urlpatterns = [
     path('form/', views.form_page, name='form_page'),
     path('success/', views.success_page, name='success_page'),
     path('delete-form/<int:form_id>/', views.delete_form, name='delete_form'),
+    path('change_credentials/', views.change_credentials, name='change_credentials'),
 ]
